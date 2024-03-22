@@ -19,12 +19,19 @@ In this project, we aim to utilize exploratory data analysis (EDA) to derive act
 Questions to answer
 
 1.What are the top-grossing movies in terms of domestic and worldwide box office revenue?
+
 2.What are the most popular movie genres in terms of audience engagement?
+
 3.How do ratings from different sources (IMDB, Rotten Tomatoes, etc.) correlate with box office performance?
+
 4.How does the production budget impact revenue and profitability?
+
 5.How does the timing of movie releases affect box office performance?
+
 6.Who are the key players in the movie industry, and what strategies contribute to their success?
+
 7. What demographic groups are the primary target audience for successful movies?
+   
 8.What strategies can Microsoft implement to effectively promote and distribute its movies to maximize audience reach and engagement?
 
 To address each of the questions using the provided datasets, we'll perform various analyses and visualizations. Let's start by loading the necessary libraries and the datasets:
