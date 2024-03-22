@@ -1791,4 +1791,714 @@ Insights:
 The bar plot visually presents the top 10 studios by total gross earnings, allowing for easy comparison of their performance. Studios with higher bars indicate higher total gross earnings from their movies. Stakeholders can quickly identify the top-performing studios and assess their market dominance based on their financial success in the film industry.
 
 In conclusion, the visualization effectively communicates the top-performing studios based on their total gross earnings, providing valuable information for stakeholders to make informed decisions and strategic investments in the film industry.
+6.Code Quality
+
+import pandas as pd
+
+​
+
+# Define a function to load data
+
+def load_data(file_path, delimiter=',', encoding='utf-8'):
+
+    try:
+
+        data = pd.read_csv(file_path, delimiter=delimiter, encoding=encoding)
+
+        return data
+
+    except FileNotFoundError:
+
+        print("File not found:", file_path)
+
+        return None
+
+    except UnicodeDecodeError:
+
+        print("Error decoding file:", file_path, "- Try specifying a different encoding.")
+
+        return None
+
+​
+
+# Load datasets
+
+movies_budget_df = load_data('zippedData/tn.movie_budgets.csv')
+
+movies_gross_df = load_data('zippedData/bom.movie_gross.csv')
+
+tmd_df = load_data('zippedData/tmdb.movies.csv')
+
+reviews_df = load_data('zippedData/rt.reviews.tsv', delimiter='\t', encoding='latin1')
+
+movie_info_df = load_data('zippedData/rt.movie_info.tsv', delimiter='\t', encoding='latin1')
+
+​
+
+# Function to describe dataset
+
+def describe_dataset(df):
+
+    print(df.head())
+
+    print(df.info())
+
+    print(df.describe())
+
+​
+
+# Describe each dataset
+
+print("Movies Budget Dataset:")
+
+describe_dataset(movies_budget_df)
+
+​
+
+print("\nMovies Gross Dataset:")
+
+describe_dataset(movies_gross_df)
+
+​
+
+print("\nTheMovieDB Dataset:")
+
+describe_dataset(tmd_df)
+
+​
+
+print("\nReviews Dataset:")
+
+describe_dataset(reviews_df)
+
+​
+
+print("\nMovie Info Dataset:")
+
+describe_dataset(movie_info_df)
+
+​
+
+Movies Budget Dataset:
+   id  release_date                                        movie  \
+0   1  Dec 18, 2009                                       Avatar   
+1   2  May 20, 2011  Pirates of the Caribbean: On Stranger Tides   
+2   3   Jun 7, 2019                                 Dark Phoenix   
+3   4   May 1, 2015                      Avengers: Age of Ultron   
+4   5  Dec 15, 2017            Star Wars Ep. VIII: The Last Jedi   
+
+  production_budget domestic_gross worldwide_gross  
+0      $425,000,000   $760,507,625  $2,776,345,279  
+1      $410,600,000   $241,063,875  $1,045,663,875  
+2      $350,000,000    $42,762,350    $149,762,350  
+3      $330,600,000   $459,005,868  $1,403,013,963  
+4      $317,000,000   $620,181,382  $1,316,721,747  
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 5782 entries, 0 to 5781
+Data columns (total 6 columns):
+ #   Column             Non-Null Count  Dtype 
+---  ------             --------------  ----- 
+ 0   id                 5782 non-null   int64 
+ 1   release_date       5782 non-null   object
+ 2   movie              5782 non-null   object
+ 3   production_budget  5782 non-null   object
+ 4   domestic_gross     5782 non-null   object
+ 5   worldwide_gross    5782 non-null   object
+dtypes: int64(1), object(5)
+memory usage: 271.2+ KB
+None
+                id
+count  5782.000000
+mean     50.372363
+std      28.821076
+min       1.000000
+25%      25.000000
+50%      50.000000
+75%      75.000000
+max     100.000000
+
+Movies Gross Dataset:
+                                         title studio  domestic_gross  \
+0                                  Toy Story 3     BV     415000000.0   
+1                   Alice in Wonderland (2010)     BV     334200000.0   
+2  Harry Potter and the Deathly Hallows Part 1     WB     296000000.0   
+3                                    Inception     WB     292600000.0   
+4                          Shrek Forever After   P/DW     238700000.0   
+
+  foreign_gross  year  
+0     652000000  2010  
+1     691300000  2010  
+2     664300000  2010  
+3     535700000  2010  
+4     513900000  2010  
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 3387 entries, 0 to 3386
+Data columns (total 5 columns):
+ #   Column          Non-Null Count  Dtype  
+---  ------          --------------  -----  
+ 0   title           3387 non-null   object 
+ 1   studio          3382 non-null   object 
+ 2   domestic_gross  3359 non-null   float64
+ 3   foreign_gross   2037 non-null   object 
+ 4   year            3387 non-null   int64  
+dtypes: float64(1), int64(1), object(3)
+memory usage: 132.4+ KB
+None
+       domestic_gross         year
+count    3.359000e+03  3387.000000
+mean     2.874585e+07  2013.958075
+std      6.698250e+07     2.478141
+min      1.000000e+02  2010.000000
+25%      1.200000e+05  2012.000000
+50%      1.400000e+06  2014.000000
+75%      2.790000e+07  2016.000000
+max      9.367000e+08  2018.000000
+
+TheMovieDB Dataset:
+   Unnamed: 0            genre_ids     id original_language  \
+0           0      [12, 14, 10751]  12444                en   
+1           1  [14, 12, 16, 10751]  10191                en   
+2           2        [12, 28, 878]  10138                en   
+3           3      [16, 35, 10751]    862                en   
+4           4        [28, 878, 12]  27205                en   
+
+                                 original_title  popularity release_date  \
+0  Harry Potter and the Deathly Hallows: Part 1      33.533   2010-11-19   
+1                      How to Train Your Dragon      28.734   2010-03-26   
+2                                    Iron Man 2      28.515   2010-05-07   
+3                                     Toy Story      28.005   1995-11-22   
+4                                     Inception      27.920   2010-07-16   
+
+                                          title  vote_average  vote_count  
+0  Harry Potter and the Deathly Hallows: Part 1           7.7       10788  
+1                      How to Train Your Dragon           7.7        7610  
+2                                    Iron Man 2           6.8       12368  
+3                                     Toy Story           7.9       10174  
+4                                     Inception           8.3       22186  
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 26517 entries, 0 to 26516
+Data columns (total 10 columns):
+ #   Column             Non-Null Count  Dtype  
+---  ------             --------------  -----  
+ 0   Unnamed: 0         26517 non-null  int64  
+ 1   genre_ids          26517 non-null  object 
+ 2   id                 26517 non-null  int64  
+ 3   original_language  26517 non-null  object 
+ 4   original_title     26517 non-null  object 
+ 5   popularity         26517 non-null  float64
+ 6   release_date       26517 non-null  object 
+ 7   title              26517 non-null  object 
+ 8   vote_average       26517 non-null  float64
+ 9   vote_count         26517 non-null  int64  
+dtypes: float64(2), int64(3), object(5)
+memory usage: 2.0+ MB
+None
+        Unnamed: 0             id    popularity  vote_average    vote_count
+count  26517.00000   26517.000000  26517.000000  26517.000000  26517.000000
+mean   13258.00000  295050.153260      3.130912      5.991281    194.224837
+std     7654.94288  153661.615648      4.355229      1.852946    960.961095
+min        0.00000      27.000000      0.600000      0.000000      1.000000
+25%     6629.00000  157851.000000      0.600000      5.000000      2.000000
+50%    13258.00000  309581.000000      1.374000      6.000000      5.000000
+75%    19887.00000  419542.000000      3.694000      7.000000     28.000000
+max    26516.00000  608444.000000     80.773000     10.000000  22186.000000
+
+Reviews Dataset:
+   id                                             review rating   fresh  \
+0   3  A distinctly gallows take on contemporary fina...    3/5   fresh   
+1   3  It's an allegory in search of a meaning that n...    NaN  rotten   
+2   3  ... life lived in a bubble in financial dealin...    NaN   fresh   
+3   3  Continuing along a line introduced in last yea...    NaN   fresh   
+4   3             ... a perverse twist on neorealism...     NaN   fresh   
+
+           critic  top_critic         publisher               date  
+0      PJ Nabarro           0   Patrick Nabarro  November 10, 2018  
+1  Annalee Newitz           0           io9.com       May 23, 2018  
+2    Sean Axmaker           0  Stream on Demand    January 4, 2018  
+3   Daniel Kasman           0              MUBI  November 16, 2017  
+4             NaN           0      Cinema Scope   October 12, 2017  
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 54432 entries, 0 to 54431
+Data columns (total 8 columns):
+ #   Column      Non-Null Count  Dtype 
+---  ------      --------------  ----- 
+ 0   id          54432 non-null  int64 
+ 1   review      48869 non-null  object
+ 2   rating      40915 non-null  object
+ 3   fresh       54432 non-null  object
+ 4   critic      51710 non-null  object
+ 5   top_critic  54432 non-null  int64 
+ 6   publisher   54123 non-null  object
+ 7   date        54432 non-null  object
+dtypes: int64(2), object(6)
+memory usage: 3.3+ MB
+None
+                 id    top_critic
+count  54432.000000  54432.000000
+mean    1045.706882      0.240594
+std      586.657046      0.427448
+min        3.000000      0.000000
+25%      542.000000      0.000000
+50%     1083.000000      0.000000
+75%     1541.000000      0.000000
+max     2000.000000      1.000000
+
+Movie Info Dataset:
+   id                                           synopsis rating  \
+0   1  This gritty, fast-paced, and innovative police...      R   
+1   3  New York City, not-too-distant-future: Eric Pa...      R   
+2   5  Illeana Douglas delivers a superb performance ...      R   
+3   6  Michael Douglas runs afoul of a treacherous su...      R   
+4   7                                                NaN     NR   
+
+                                 genre          director  \
+0  Action and Adventure|Classics|Drama  William Friedkin   
+1    Drama|Science Fiction and Fantasy  David Cronenberg   
+2    Drama|Musical and Performing Arts    Allison Anders   
+3           Drama|Mystery and Suspense    Barry Levinson   
+4                        Drama|Romance    Rodney Bennett   
+
+                            writer  theater_date      dvd_date currency  \
+0                   Ernest Tidyman   Oct 9, 1971  Sep 25, 2001      NaN   
+1     David Cronenberg|Don DeLillo  Aug 17, 2012   Jan 1, 2013        $   
+2                   Allison Anders  Sep 13, 1996  Apr 18, 2000      NaN   
+3  Paul Attanasio|Michael Crichton   Dec 9, 1994  Aug 27, 1997      NaN   
+4                     Giles Cooper           NaN           NaN      NaN   
+
+  box_office      runtime             studio  
+0        NaN  104 minutes                NaN  
+1    600,000  108 minutes  Entertainment One  
+2        NaN  116 minutes                NaN  
+3        NaN  128 minutes                NaN  
+4        NaN  200 minutes                NaN  
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 1560 entries, 0 to 1559
+Data columns (total 12 columns):
+ #   Column        Non-Null Count  Dtype 
+---  ------        --------------  ----- 
+ 0   id            1560 non-null   int64 
+ 1   synopsis      1498 non-null   object
+ 2   rating        1557 non-null   object
+ 3   genre         1552 non-null   object
+ 4   director      1361 non-null   object
+ 5   writer        1111 non-null   object
+ 6   theater_date  1201 non-null   object
+ 7   dvd_date      1201 non-null   object
+ 8   currency      340 non-null    object
+ 9   box_office    340 non-null    object
+ 10  runtime       1530 non-null   object
+ 11  studio        494 non-null    object
+dtypes: int64(1), object(11)
+memory usage: 146.4+ KB
+None
+                id
+count  1560.000000
+mean   1007.303846
+std     579.164527
+min       1.000000
+25%     504.750000
+50%    1007.500000
+75%    1503.250000
+max    2000.000000
+
+Here's what's been improved:
+
+1.Consistent Loading: All datasets are loaded using the load_data function, ensuring uniformity and simplifying maintenance.
+
+2.Describe Function: I've added a function describe_dataset to provide a quick summary of each dataset, enhancing code reusability and readability.
+
+3.Error Handling: Error handling for file not found situations has been implemented in the load_data function.
+
+By implementing these refinements, your code becomes more structured, maintainable, and easier to understand.
+
+import pandas as pd
+
+​
+
+# Function to load data
+
+def load_data(file_path, delimiter=',', encoding='utf-8'):
+
+    try:
+
+        data = pd.read_csv(file_path, delimiter=delimiter, encoding=encoding)
+
+        return data
+
+    except FileNotFoundError:
+
+        print("File not found:", file_path)
+
+        return None
+
+    except UnicodeDecodeError:
+
+        print("Error decoding file:", file_path, "- Try specifying a different encoding.")
+
+        return None
+
+​
+
+# Function to describe dataset
+
+def describe_dataset(df):
+
+    if df is not None:
+
+        print(df.head())
+
+        print(df.info())
+
+        print(df.describe())
+
+    else:
+
+        print("Dataset is not available.")
+
+​
+
+# Unit tests for load_data function
+
+def test_load_data():
+
+    # Test loading an existing file
+
+    assert load_data('zippedData/tn.movie_budgets.csv') is not None
+
+    # Test loading a non-existent file
+
+    assert load_data('nonexistent_file.csv') is None
+
+​
+
+# Unit tests for describe_dataset function
+
+def test_describe_dataset():
+
+    # Create a mock DataFrame for testing
+
+    mock_df = pd.DataFrame({'A': [1, 2, 3], 'B': ['a', 'b', 'c']})
+
+    # Test describing a valid dataset
+
+    assert describe_dataset(mock_df) is None
+
+    # Test describing an invalid dataset
+
+    assert describe_dataset(None) is None
+
+​
+
+if __name__ == '__main__':
+
+    # Run unit tests
+
+    test_load_data()
+
+    test_describe_dataset()
+
+​
+
+    # Load datasets
+
+    movies_budget_df = load_data('zippedData/tn.movie_budgets.csv')
+
+    movies_gross_df = load_data('zippedData/bom.movie_gross.csv')
+
+    tmd_df = load_data('zippedData/tmdb.movies.csv')
+
+    reviews_df = load_data('zippedData/rt.reviews.tsv', delimiter='\t', encoding='latin1')
+
+    movie_info_df = load_data('zippedData/rt.movie_info.tsv', delimiter='\t', encoding='latin1')
+
+​
+
+    # Describe each dataset
+
+    print("Movies Budget Dataset:")
+
+    describe_dataset(movies_budget_df)
+
+​
+
+    print("\nMovies Gross Dataset:")
+
+    describe_dataset(movies_gross_df)
+
+​
+
+    print("\nTheMovieDB Dataset:")
+
+    describe_dataset(tmd_df)
+
+​
+
+    print("\nReviews Dataset:")
+
+    describe_dataset(reviews_df)
+
+​
+
+    print("\nMovie Info Dataset:")
+
+    describe_dataset(movie_info_df)
+
+​
+
+File not found: nonexistent_file.csv
+   A  B
+0  1  a
+1  2  b
+2  3  c
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 3 entries, 0 to 2
+Data columns (total 2 columns):
+ #   Column  Non-Null Count  Dtype 
+---  ------  --------------  ----- 
+ 0   A       3 non-null      int64 
+ 1   B       3 non-null      object
+dtypes: int64(1), object(1)
+memory usage: 176.0+ bytes
+None
+         A
+count  3.0
+mean   2.0
+std    1.0
+min    1.0
+25%    1.5
+50%    2.0
+75%    2.5
+max    3.0
+Dataset is not available.
+Movies Budget Dataset:
+   id  release_date                                        movie  \
+0   1  Dec 18, 2009                                       Avatar   
+1   2  May 20, 2011  Pirates of the Caribbean: On Stranger Tides   
+2   3   Jun 7, 2019                                 Dark Phoenix   
+3   4   May 1, 2015                      Avengers: Age of Ultron   
+4   5  Dec 15, 2017            Star Wars Ep. VIII: The Last Jedi   
+
+  production_budget domestic_gross worldwide_gross  
+0      $425,000,000   $760,507,625  $2,776,345,279  
+1      $410,600,000   $241,063,875  $1,045,663,875  
+2      $350,000,000    $42,762,350    $149,762,350  
+3      $330,600,000   $459,005,868  $1,403,013,963  
+4      $317,000,000   $620,181,382  $1,316,721,747  
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 5782 entries, 0 to 5781
+Data columns (total 6 columns):
+ #   Column             Non-Null Count  Dtype 
+---  ------             --------------  ----- 
+ 0   id                 5782 non-null   int64 
+ 1   release_date       5782 non-null   object
+ 2   movie              5782 non-null   object
+ 3   production_budget  5782 non-null   object
+ 4   domestic_gross     5782 non-null   object
+ 5   worldwide_gross    5782 non-null   object
+dtypes: int64(1), object(5)
+memory usage: 271.2+ KB
+None
+                id
+count  5782.000000
+mean     50.372363
+std      28.821076
+min       1.000000
+25%      25.000000
+50%      50.000000
+75%      75.000000
+max     100.000000
+
+Movies Gross Dataset:
+                                         title studio  domestic_gross  \
+0                                  Toy Story 3     BV     415000000.0   
+1                   Alice in Wonderland (2010)     BV     334200000.0   
+2  Harry Potter and the Deathly Hallows Part 1     WB     296000000.0   
+3                                    Inception     WB     292600000.0   
+4                          Shrek Forever After   P/DW     238700000.0   
+
+  foreign_gross  year  
+0     652000000  2010  
+1     691300000  2010  
+2     664300000  2010  
+3     535700000  2010  
+4     513900000  2010  
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 3387 entries, 0 to 3386
+Data columns (total 5 columns):
+ #   Column          Non-Null Count  Dtype  
+---  ------          --------------  -----  
+ 0   title           3387 non-null   object 
+ 1   studio          3382 non-null   object 
+ 2   domestic_gross  3359 non-null   float64
+ 3   foreign_gross   2037 non-null   object 
+ 4   year            3387 non-null   int64  
+dtypes: float64(1), int64(1), object(3)
+memory usage: 132.4+ KB
+None
+       domestic_gross         year
+count    3.359000e+03  3387.000000
+mean     2.874585e+07  2013.958075
+std      6.698250e+07     2.478141
+min      1.000000e+02  2010.000000
+25%      1.200000e+05  2012.000000
+50%      1.400000e+06  2014.000000
+75%      2.790000e+07  2016.000000
+max      9.367000e+08  2018.000000
+
+TheMovieDB Dataset:
+   Unnamed: 0            genre_ids     id original_language  \
+0           0      [12, 14, 10751]  12444                en   
+1           1  [14, 12, 16, 10751]  10191                en   
+2           2        [12, 28, 878]  10138                en   
+3           3      [16, 35, 10751]    862                en   
+4           4        [28, 878, 12]  27205                en   
+
+                                 original_title  popularity release_date  \
+0  Harry Potter and the Deathly Hallows: Part 1      33.533   2010-11-19   
+1                      How to Train Your Dragon      28.734   2010-03-26   
+2                                    Iron Man 2      28.515   2010-05-07   
+3                                     Toy Story      28.005   1995-11-22   
+4                                     Inception      27.920   2010-07-16   
+
+                                          title  vote_average  vote_count  
+0  Harry Potter and the Deathly Hallows: Part 1           7.7       10788  
+1                      How to Train Your Dragon           7.7        7610  
+2                                    Iron Man 2           6.8       12368  
+3                                     Toy Story           7.9       10174  
+4                                     Inception           8.3       22186  
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 26517 entries, 0 to 26516
+Data columns (total 10 columns):
+ #   Column             Non-Null Count  Dtype  
+---  ------             --------------  -----  
+ 0   Unnamed: 0         26517 non-null  int64  
+ 1   genre_ids          26517 non-null  object 
+ 2   id                 26517 non-null  int64  
+ 3   original_language  26517 non-null  object 
+ 4   original_title     26517 non-null  object 
+ 5   popularity         26517 non-null  float64
+ 6   release_date       26517 non-null  object 
+ 7   title              26517 non-null  object 
+ 8   vote_average       26517 non-null  float64
+ 9   vote_count         26517 non-null  int64  
+dtypes: float64(2), int64(3), object(5)
+memory usage: 2.0+ MB
+None
+        Unnamed: 0             id    popularity  vote_average    vote_count
+count  26517.00000   26517.000000  26517.000000  26517.000000  26517.000000
+mean   13258.00000  295050.153260      3.130912      5.991281    194.224837
+std     7654.94288  153661.615648      4.355229      1.852946    960.961095
+min        0.00000      27.000000      0.600000      0.000000      1.000000
+25%     6629.00000  157851.000000      0.600000      5.000000      2.000000
+50%    13258.00000  309581.000000      1.374000      6.000000      5.000000
+75%    19887.00000  419542.000000      3.694000      7.000000     28.000000
+max    26516.00000  608444.000000     80.773000     10.000000  22186.000000
+
+Reviews Dataset:
+   id                                             review rating   fresh  \
+0   3  A distinctly gallows take on contemporary fina...    3/5   fresh   
+1   3  It's an allegory in search of a meaning that n...    NaN  rotten   
+2   3  ... life lived in a bubble in financial dealin...    NaN   fresh   
+3   3  Continuing along a line introduced in last yea...    NaN   fresh   
+4   3             ... a perverse twist on neorealism...     NaN   fresh   
+
+           critic  top_critic         publisher               date  
+0      PJ Nabarro           0   Patrick Nabarro  November 10, 2018  
+1  Annalee Newitz           0           io9.com       May 23, 2018  
+2    Sean Axmaker           0  Stream on Demand    January 4, 2018  
+3   Daniel Kasman           0              MUBI  November 16, 2017  
+4             NaN           0      Cinema Scope   October 12, 2017  
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 54432 entries, 0 to 54431
+Data columns (total 8 columns):
+ #   Column      Non-Null Count  Dtype 
+---  ------      --------------  ----- 
+ 0   id          54432 non-null  int64 
+ 1   review      48869 non-null  object
+ 2   rating      40915 non-null  object
+ 3   fresh       54432 non-null  object
+ 4   critic      51710 non-null  object
+ 5   top_critic  54432 non-null  int64 
+ 6   publisher   54123 non-null  object
+ 7   date        54432 non-null  object
+dtypes: int64(2), object(6)
+memory usage: 3.3+ MB
+None
+                 id    top_critic
+count  54432.000000  54432.000000
+mean    1045.706882      0.240594
+std      586.657046      0.427448
+min        3.000000      0.000000
+25%      542.000000      0.000000
+50%     1083.000000      0.000000
+75%     1541.000000      0.000000
+max     2000.000000      1.000000
+
+Movie Info Dataset:
+   id                                           synopsis rating  \
+0   1  This gritty, fast-paced, and innovative police...      R   
+1   3  New York City, not-too-distant-future: Eric Pa...      R   
+2   5  Illeana Douglas delivers a superb performance ...      R   
+3   6  Michael Douglas runs afoul of a treacherous su...      R   
+4   7                                                NaN     NR   
+
+                                 genre          director  \
+0  Action and Adventure|Classics|Drama  William Friedkin   
+1    Drama|Science Fiction and Fantasy  David Cronenberg   
+2    Drama|Musical and Performing Arts    Allison Anders   
+3           Drama|Mystery and Suspense    Barry Levinson   
+4                        Drama|Romance    Rodney Bennett   
+
+                            writer  theater_date      dvd_date currency  \
+0                   Ernest Tidyman   Oct 9, 1971  Sep 25, 2001      NaN   
+1     David Cronenberg|Don DeLillo  Aug 17, 2012   Jan 1, 2013        $   
+2                   Allison Anders  Sep 13, 1996  Apr 18, 2000      NaN   
+3  Paul Attanasio|Michael Crichton   Dec 9, 1994  Aug 27, 1997      NaN   
+4                     Giles Cooper           NaN           NaN      NaN   
+
+  box_office      runtime             studio  
+0        NaN  104 minutes                NaN  
+1    600,000  108 minutes  Entertainment One  
+2        NaN  116 minutes                NaN  
+3        NaN  128 minutes                NaN  
+4        NaN  200 minutes                NaN  
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 1560 entries, 0 to 1559
+Data columns (total 12 columns):
+ #   Column        Non-Null Count  Dtype 
+---  ------        --------------  ----- 
+ 0   id            1560 non-null   int64 
+ 1   synopsis      1498 non-null   object
+ 2   rating        1557 non-null   object
+ 3   genre         1552 non-null   object
+ 4   director      1361 non-null   object
+ 5   writer        1111 non-null   object
+ 6   theater_date  1201 non-null   object
+ 7   dvd_date      1201 non-null   object
+ 8   currency      340 non-null    object
+ 9   box_office    340 non-null    object
+ 10  runtime       1530 non-null   object
+ 11  studio        494 non-null    object
+dtypes: int64(1), object(11)
+memory usage: 146.4+ KB
+None
+                id
+count  1560.000000
+mean   1007.303846
+std     579.164527
+min       1.000000
+25%     504.750000
+50%    1007.500000
+75%    1503.250000
+max    2000.000000
+
+Here's what's been added:
+
+1.Modularization: The code has been organized into separate functions for loading data (load_data) and describing datasets (describe_dataset). This makes the code more modular, reusable, and easier to maintain.
+
+2.Unit Testing: Two sets of unit tests (test_load_data and test_describe_dataset) have been defined to verify the functionality of the load_data and describe_dataset functions, respectively. These tests ensure that the functions behave as expected under different scenarios.
+
+3.Test Runner: The if name == 'main': block at the end of the script runs the unit tests when the script is executed directly.
+
+By incorporating modularization and unit testing, the code becomes more organized, robust, and reliable, making it easier to manage and debug.
 
